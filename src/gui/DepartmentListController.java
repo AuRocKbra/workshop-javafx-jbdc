@@ -1,17 +1,26 @@
 package gui;
 
+
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import application.Main;
+import gui.util.Alerts;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.entities.Department;
 import model.services.DepartmentService;
@@ -48,8 +57,9 @@ public class DepartmentListController implements Initializable{
 	}
 	
 	@FXML
-	public void onBtNewAction() {
-		System.out.println("press bt new!");
+	public void onBtNewAction(ActionEvent evento) {
+		Stage parentStage = gui.util.Utils.currentStage(evento);
+		createDialogForm("/gui/DepartmentForm.fxml", parentStage);
 	}
 	
 	@Override	
@@ -65,5 +75,20 @@ public class DepartmentListController implements Initializable{
 		tableViewDepartment.prefHeightProperty().bind(stage.heightProperty());//atribui as propriedades do stage a tabela
 		/*********************************************************************/
 	}
-
+	
+	private void createDialogForm(String absoluteName,Stage parentStage) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+			Pane pane = loader.load();
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Informe dados do departamento");
+			dialogStage.setScene(new Scene(pane));
+			dialogStage.setResizable(false);//bloqueia o redimencionamento
+			dialogStage.initOwner(parentStage);//informa de qual janela ela herda os a exibição
+			dialogStage.initModality(Modality.WINDOW_MODAL);//bloqueia a ação para somente a janela em evidência
+			dialogStage.showAndWait();
+		}catch(IOException e) {
+			Alerts.showAlertas("IOException","Erro ao carregar janela",e.getMessage(),AlertType.ERROR);
+		}
+	}
 }
