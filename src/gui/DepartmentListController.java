@@ -8,6 +8,8 @@ import java.util.ResourceBundle;
 import application.Main;
 import gui.listeners.DataChangeListener;
 import gui.util.Alerts;
+import gui.util.Utils;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -17,6 +19,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -41,6 +44,9 @@ public class DepartmentListController implements Initializable,DataChangeListene
 	private TableColumn<Department, String> tableColumnName;
 	
 	@FXML
+	private TableColumn<Department, Department>tableColumnEDIT;
+	
+	@FXML
 	private Button btNew;
 	
 	public void setDeparmentService(DepartmentService service) {
@@ -54,6 +60,7 @@ public class DepartmentListController implements Initializable,DataChangeListene
 		else {
 			obsList = FXCollections.observableArrayList(service.findAll());
 			tableViewDepartment.setItems(obsList);
+			initEditButtons();
 		}
 	}
 	
@@ -102,5 +109,24 @@ public class DepartmentListController implements Initializable,DataChangeListene
 	@Override
 	public void onDataChange() {
 		updateTableView();
+	}
+	
+	private void initEditButtons() {//cria e atribui a função aos botões de edit de cada celula
+		tableColumnEDIT.setCellValueFactory(param->new ReadOnlyObjectWrapper<>(param.getValue()));
+		tableColumnEDIT.setCellFactory(param->new TableCell<Department,Department>(){
+			private final Button button = new Button("Edit");
+			
+			@Override
+			protected void updateItem(Department obj,boolean empty) {
+				super.updateItem(obj,empty);
+				
+				if(obj==null) {
+					setGraphic(null);
+					return;
+				}
+				setGraphic(button);
+				button.setOnAction(event->createDialogForm(obj,"/gui/DepartmentForm.fxml",Utils.currentStage(event)));
+			}
+		});
 	}
 }
