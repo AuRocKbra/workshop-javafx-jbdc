@@ -3,7 +3,9 @@ package gui;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import db.DBException;
 import gui.listeners.DataChangeListener;
@@ -18,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.entities.Department;
+import model.exceptions.ValidationException;
 import model.services.DepartmentService;
 
 public class DepartmentFormController implements Initializable{
@@ -55,10 +58,13 @@ public class DepartmentFormController implements Initializable{
 			entity = getFormData();
 			service.saveOrUpdate(entity);
 			notifyDataChangeListeners();
-		}catch(DBException e) {
+			gui.util.Utils.currentStage(event).close();
+		}catch(ValidationException e) {
+			setErrorsMessages(e.getErrors());
+		}
+		catch(DBException e) {
 			Alerts.showAlertas("Error", "Operação de salvar dados",e.getMessage(),AlertType.ERROR);
 		}
-		gui.util.Utils.currentStage(event).close();
 	}
 	
 	private void notifyDataChangeListeners() {
@@ -69,8 +75,15 @@ public class DepartmentFormController implements Initializable{
 
 	private Department getFormData() {
 		Department obj = new Department();
+		ValidationException exception = new ValidationException("Erro de validação");
 		obj.setId(gui.util.Utils.tryParseToInt(txtId.getText()));
+		if(txtNome.getText()==null || txtNome.getText().trim().equals("")) {
+			exception.addError("Nome"," <-Este campo não pode ser vazio!");
+		}
 		obj.setNome(txtNome.getText());
+		if(exception.getErrors().size()>0) {
+			throw exception;
+		}
 		return obj;
 	}
 
@@ -112,5 +125,11 @@ public class DepartmentFormController implements Initializable{
 	
 	public void subcribeDataChangeListener(DataChangeListener listener) {
 		dataChangeListeners.add(listener);
+	}
+	private void setErrorsMessages(Map<String,String> erros) {
+		Set<String> fields = erros.keySet();
+		if(fields.contains("Nome")) {
+			labelErrorName.setText(erros.get("Nome"));
+		}
 	}
 }
