@@ -1,6 +1,7 @@
 package gui;
 
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
 import java.util.Optional;
@@ -16,7 +17,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -24,6 +27,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import model.entities.Seller;
 import model.services.SellerService;
@@ -66,7 +71,7 @@ public class SellerListController implements Initializable,DataChangeListener{
 	
 	public void updateTableView() {
 		if(service==null) {
-			throw new IllegalStateException("Servico é null!");
+			throw new IllegalStateException("Serviço é null!");
 		}
 		else {
 			obsList = FXCollections.observableArrayList(service.findAll());
@@ -103,24 +108,24 @@ public class SellerListController implements Initializable,DataChangeListener{
 	}
 	
 	private void createDialogForm(Seller obj,String absoluteName,Stage parentStage) {
-//		try {
-//			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
-//			Pane pane = loader.load();
-//			SellerFormController controller = loader.getController();
-//			controller.setSeller(obj);
-//			controller.setSellerService(new SellerService());
-//			controller.subcribeDataChangeListener(this);
-//			controller.updateFormData();
-//			Stage dialogStage = new Stage();
-//			dialogStage.setTitle("Informe dados do departamento");
-//			dialogStage.setScene(new Scene(pane));
-//			dialogStage.setResizable(false);//bloqueia o redimencionamento
-//			dialogStage.initOwner(parentStage);//informa de qual janela ela herda os a exibição
-//			dialogStage.initModality(Modality.WINDOW_MODAL);//bloqueia a ação para somente a janela em evidência
-//			dialogStage.showAndWait();
-//		}catch(IOException e) {
-//			Alerts.showAlertas("IOException","Erro ao carregar janela",e.getMessage(),AlertType.ERROR);
-//		}
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
+			Pane pane = loader.load();
+			SellerFormController controller = loader.getController();
+			controller.setSeller(obj);
+			controller.setSellerService(new SellerService());
+			controller.subcribeDataChangeListener(this);
+			controller.updateFormData();
+			Stage dialogStage = new Stage();
+			dialogStage.setTitle("Informe dados do vendedor");
+			dialogStage.setScene(new Scene(pane));
+			dialogStage.setResizable(false);//bloqueia o redimencionamento
+			dialogStage.initOwner(parentStage);//informa de qual janela ela herda os a exibição
+			dialogStage.initModality(Modality.WINDOW_MODAL);//bloqueia a ação para somente a janela em evidência
+			dialogStage.showAndWait();
+		}catch(IOException e) {
+			Alerts.showAlertas("IOException","Erro ao carregar janela",e.getMessage(),AlertType.ERROR);
+		}
 	}
 
 	@Override
