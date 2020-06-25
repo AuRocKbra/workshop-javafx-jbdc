@@ -1,9 +1,11 @@
 package gui;
 
 import java.net.URL;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -118,6 +120,26 @@ public class SellerFormController implements Initializable{
 			exception.addError("Nome"," <-Este campo não pode ser vazio!");
 		}
 		obj.setNome(txtNome.getText());
+		if(txtEmail.getText()==null || txtEmail.getText().trim().equals("")) {
+			exception.addError("Email"," <-Este campo não pode ser vazio!");
+		}
+		obj.setEmail(txtEmail.getText());
+		
+		if(dpBirthDate.getValue()==null) {
+			exception.addError("BirthDate", " <-Este campo não pode ser vazio!");
+		}
+		else {
+			Instant instant = Instant.from(dpBirthDate.getValue().atStartOfDay(ZoneId.systemDefault()));
+			obj.setBirthDate(Date.from(instant));
+		}	
+		
+		if(txtBaseSalary.getText()==null || txtBaseSalary.getText().trim().equals("")) {
+			exception.addError("BaseSalary"," <-Este campo não pode ser vazio!");
+		}
+		obj.setBaseSalary(Utils.tryParseToDouble(txtBaseSalary.getText()));
+		
+		obj.setDepartment(comboBoxDepartment.getValue());
+		
 		if(exception.getErrors().size()>0) {
 			throw exception;
 		}
@@ -139,7 +161,7 @@ public class SellerFormController implements Initializable{
 		Constraints.setTextFieldMaxLength(txtNome, 70);
 		Constraints.setTextFieldDouble(txtBaseSalary);
 		Constraints.setTextFieldMaxLength(txtEmail, 60);
-		Utils.formatDatePicker(dpBirthDate, "dd/MM/yyyy");
+		Utils.formatDatePicker(dpBirthDate, "dd/MM/yyyy");	
 		initializeComboBoxDepartment();
 	}
 	
@@ -182,9 +204,10 @@ public class SellerFormController implements Initializable{
 	}
 	private void setErrorsMessages(Map<String,String> erros) {
 		Set<String> fields = erros.keySet();
-		if(fields.contains("Nome")) {
-			labelErrorName.setText(erros.get("Nome"));
-		}
+		labelErrorName.setText(fields.contains("Nome")? erros.get("Nome"):"");
+		labelErrorEmail.setText(fields.contains("Email")? erros.get("Email"):"");
+		labelErrorBaseSalary.setText(fields.contains("BaseSalary")? erros.get("BaseSalary"):"");
+		labelErrorBirthDate.setText(fields.contains("BirthDate")?erros.get("BirthDate"):"");
 	}
 	
 	public void loadAssociatedObjects() {
