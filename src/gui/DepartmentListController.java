@@ -109,6 +109,7 @@ public class DepartmentListController implements Initializable,DataChangeListene
 			dialogStage.initModality(Modality.WINDOW_MODAL);//bloqueia a ação para somente a janela em evidência
 			dialogStage.showAndWait();
 		}catch(IOException e) {
+			e.printStackTrace();
 			Alerts.showAlertas("IOException","Erro ao carregar janela",e.getMessage(),AlertType.ERROR);
 		}
 	}
